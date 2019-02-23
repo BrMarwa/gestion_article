@@ -1,0 +1,51 @@
+# To get started with security, check out the documentation:
+# https://symfony.com/doc/current/security.html
+security:
+  encoders:
+    #Symfony\Component\Security\Core\User\User: plaintext
+    OC\UserBundle\Entity\User: sha512
+
+
+  role_hierarchy:
+    ROLE_ADMIN:       [ROLE_AUTEUR, ROLE_MODERATEUR]
+    ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+
+    # https://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
+  providers:
+    main:
+      id: fos_user.user_provider.username
+    #in_memory:
+     # memory:
+      #  users:
+       #   user:  { password: userpass, roles: [ 'ROLE_USER' ] }
+        #  admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
+        # … vous pouvez supprimer le fournisseur « in_memory »
+    # Et voici notre nouveau fournisseur :
+
+
+  firewalls:
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        # On crée un pare-feu uniquement pour le formulaire
+        #main_login:
+        # Cette expression régulière permet de prendre /login (mais pas /login_check !)
+           # pattern:   ^/login$
+           # anonymous: true # On autorise alors les anonymes sur ce pare-feu
+        main:
+            pattern:   ^/
+            anonymous: true
+            provider:  main
+            form_login:
+              login_path: fos_user_security_login
+              check_path: fos_user_security_check
+            logout:
+              path:       fos_user_security_logout
+              target:     fos_user_security_login
+            remember_me:
+              secret:     %secret% # %secret% est un paramètre de parameter
+
+
+  access_control:
+    - { path: ^/admin, roles: ROLE_ADMIN }

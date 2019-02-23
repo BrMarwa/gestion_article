@@ -1,0 +1,70 @@
+{# src/OC/PlatformBundle/Resources/views/Advert/purge.html.twig #}
+
+{% extends "OCPlatformBundle::layout.html.twig" %}
+
+{% block title %}
+  Page de test - {{ parent() }}
+{% endblock %}
+
+{% block ocplatform_body %}
+
+  <h2>Liste des annonces</h2>
+
+  <ul>
+    {% for advert in listAdverts %}
+      <li>
+        <a href="{{ path('oc_platform_view', {'id': advert.id}) }}">
+          {{ advert.title }}
+          
+        </a>
+        {% for v2 in advert.applications %}
+        {#}<h2> applications : {{ dump (advert.applications) }} </h2> {#}
+        <ul> Applications : 
+        <li>  {{ v2.author }} </li>
+        <li>  {{ v2.content }} </li>
+        </ul>
+        {% endfor %}
+      <h3>
+      {# On vérifie qu'une image soit bien associée à l'annonce #}
+      {% if advert.image is not null %}
+       <img src="{{ advert.image.url }}" alt="{{ advert.image.alt }}">
+      {% endif %}
+      </h3>
+      <h4>
+          {#}<li>Skill level : {{ advert.advertskills.level }} </li>{#}
+           <ul> Skills :
+            {% for skills in advert.advertskills %}   
+                    <li>  {{ skills.level }} </li>  
+             {% endfor %}
+            </ul>
+      </h4>
+        par {{ advert.author }},
+        le {{ advert.date|date('d/m/Y') }}
+      </li>
+    {% else %}
+      <li>Pas (encore !) d'annonces</li>
+    {% endfor %}
+  </ul>
+
+{#}
+ <h2>Liste des candidatures (Applications)</h2>
+
+  <ul>
+    {% for application in listApplications %}
+      <li>
+        <a href="{{ path('oc_platform_view', {'id': application.id}) }}">
+          {{ application.author }}
+        </a>
+        <p> {{ application.content }}, </p>
+        le {{ application.date|date('d/m/Y') }}
+      </li>
+      <li>
+      Le titre de l'annonce : {{ application.advert.title }}
+      </li>
+    {% else %}
+      <li>Pas (encore !) de candidatures</li>
+    {% endfor %}
+  </ul>
+{#}
+
+{% endblock %}

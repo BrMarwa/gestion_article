@@ -1,0 +1,49 @@
+{# src/OC/PlatformBundle/Resources/views/Advert/index.html.twig #}
+
+{% extends "OCPlatformBundle::layout.html.twig" %}
+
+{% block title %}
+  Accueil - {{ parent() }}
+{% endblock %}
+
+{% block ocplatform_body %}
+
+  <h2>Liste des annonces</h2>
+
+  <ul>
+    {% for advert in listAdverts %}
+      <li>
+        <a href="{{ path('oc_platform_view', {'id': advert.id}) }}">
+          {{ advert.title }}
+        </a>
+        <h3>
+          {# On vérifie qu'une image soit bien associée à l'annonce #}
+          {% if advert.image is not null %}
+           <img src="{{ advert.image.url }}" alt="{{ advert.image.alt }}">
+          {% endif %}
+        </h3>
+         <h4>
+          {#}<li>Skill level : {{ advert.advertskills.level }} </li>{#}
+           <ul> Skills :
+            {% for skills in advert.advertskills %}   
+                    <li>  {{ skills.level }} </li>  
+             {% endfor %}
+            </ul>
+        </h4>
+        par {{ advert.author }},
+        le {{ advert.date|date('d/m/Y') }}
+      </li>
+    {% else %}
+      <li>Pas (encore !) d'annonces</li>
+    {% endfor %}
+  </ul>
+  <ul class="pagination">
+  {# On utilise la fonction range(a, b) qui crée un tableau de valeurs entre a et b #}
+  {% for p in range(1, nbPages) %}
+    <li{% if p == page %} class="active"{% endif %}>
+      <a href="{{ path('oc_platform_home', {'page': p}) }}">{{ p }}</a>
+    </li>
+  {% endfor %}
+</ul>
+
+{% endblock %}
