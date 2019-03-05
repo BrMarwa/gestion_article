@@ -14,6 +14,13 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
  */
 class AdvertRepository extends \Doctrine\ORM\EntityRepository
 {
+  public function getUser()
+    {
+        echo $this->container->get('security.token_storage')->getToken()->getUser();
+    //var_dump($userManager);  
+    //die();
+    }
+    
   public function getAdvertsBefore(\Datetime $date)
   {
     return $this->createQueryBuilder('a')

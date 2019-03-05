@@ -5,6 +5,7 @@
 namespace OC\PlatformBundle\Controller;
 
 use OC\PlatformBundle\Entity\Advert;
+use OC\PlatformBundle\Entity\User;
 use OC\PlatformBundle\Entity\Image;
 use OC\PlatformBundle\Entity\Skill;
 use OC\PlatformBundle\Entity\AdvertSkill;
@@ -16,13 +17,18 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use OC\PlatformBundle\Form\AdvertType;
 use OC\PlatformBundle\Form\ApplicationType;
 use OC\PlatformBundle\Form\AdvertEditType;
+use OC\PlatformBundle\Event\PlatformEvents;
+use OC\PlatformBundle\Event\MessagePostEvent;
 // à utiliser avec le service d'autorisation security.authorization_checker
 //use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 // à utiliser avec les annotations d'autorisations 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
+
+
 class AdvertController extends Controller
 {
+  
   public function purgeAction($days, Request $request)
   {
      // On récupère notre service
@@ -275,11 +281,12 @@ class AdvertController extends Controller
      'listAdvertSkills' => $listAdvertSkills
     ));
   }
-   /**
-   * @Security("has_role('ROLE_AUTEUR')")
-   */
+  
+  
+  
   public function addAction(Request $request)
   {
+    
     
     /*
     // Récupération d'une annonce déjà existante, d'id $id.
@@ -291,6 +298,27 @@ class AdvertController extends Controller
     ;
     */
     $advert = new Advert();
+    /*
+    renvoi le username courant sous forme de string
+    //$user = $this->get('security.token_storage')->getToken()->getUser();
+    $user = $this->get('security.token_storage')->getToken()->getUsername();
+    $advert->setUser($user);
+   echo  $advert->getUser(); 
+   */
+  /*
+  $advert = $this->getDoctrine()
+    ->getManager()
+    ->getRepository('OCUserBundle:User')
+    ->findAll();
+    */
+    // Pour récupérer le service UserManager du bundle
+$userManager = $this->get('fos_user.user_manager');
+
+// Pour charger un utilisateur
+$user = $userManager->findUserBy(array('username' => 'test'));
+
+   //var_dump($user);
+    //die();
     $form   = $this->get('form.factory')->create(AdvertType::class, $advert);
 
 
@@ -301,6 +329,16 @@ class AdvertController extends Controller
     $listErrors = $validator->validate($advert);
 
     if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
+      //tester l'évènement PostMessage
+      // On crée l'évènement avec ses 2 arguments
+      $event = new MessagePostEvent($advert->getContent(), $user);
+
+      // On déclenche l'évènement
+      $this->get('event_dispatcher')->dispatch(PlatformEvents::POST_MESSAGE, $event);
+
+      // On récupère ce qui a été modifié par le ou les listeners, ici le message
+      $advert->setContent($event->getMessage());
+
       $em = $this->getDoctrine()->getManager();
       $em->persist($advert);
       $em->flush();

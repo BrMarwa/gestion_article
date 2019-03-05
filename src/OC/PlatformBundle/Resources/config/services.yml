@@ -57,4 +57,17 @@ services:
           - "@oc_platform.beta.html_adder"
           - "2017-06-01"
         tags:
-          - { name: kernel.event_listener, event: kernel.response, method: processBeta }
+          - { name: kernel.event_listener, event: kernel.response, method: processBeta, priority: 2 }
+
+      oc_platform.bigbrother.message_notificator:
+        class: OC\PlatformBundle\Bigbrother\MessageNotificator
+        arguments:
+          - "@mailer"
+    
+      oc_platform.bigbrother.message_listener:
+        class: OC\PlatformBundle\Bigbrother\MessageListener
+        arguments:
+          - "@oc_platform.bigbrother.message_notificator"
+          - ["alexandre", "marine", "pierre"]
+        tags:
+          - { name: kernel.event_listener, event: oc_platform.post_message, method: processMessage }

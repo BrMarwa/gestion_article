@@ -11,6 +11,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 // On rajoute ce use pour la contrainte :
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use OC\PlatformBundle\Validator\Antiflood;
+use Symfony\Component\Security\Core\Security;
+
 
 /**
  * Advert
@@ -113,14 +115,27 @@ class Advert
      */
     private $published = true;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="user", type="string", length=255)
+     * @Assert\Length(min=2)
+     */
+    private $user;
+
     public function __construct()
     {
+      
+      // initialiser le champ user momentanément
+      $this->user = "null";
       // Par défaut, la date de l'annonce est la date d'aujourd'hui
       $this->date = new \Datetime();
       $this->categories = new ArrayCollection();
       $this->applications = new ArrayCollection(); 
       $this->advertskills = new ArrayCollection();
     }
+
+    
 
     /**
      * @Assert\Callback
@@ -524,5 +539,29 @@ class Advert
     public function getAdvertskills()
     {
         return $this->advertskills;
+    }
+
+    /**
+     * Set user.
+     *
+     * @param string $user
+     *
+     * @return Advert
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user.
+     *
+     * @return string
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 }
