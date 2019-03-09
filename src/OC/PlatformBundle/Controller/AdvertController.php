@@ -28,6 +28,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 class AdvertController extends Controller
 {
+  public function translationAction($name)
+  {
+    return $this->render('OCPlatformBundle:Advert:translation.html.twig', array(
+      'name' => $name
+    ));
+  }
   
   public function purgeAction($days, Request $request)
   {
